@@ -2,34 +2,54 @@
 
 Turn a post on X into an image you can put on Instagram.
 
+![A post rendered on the Dusk gradient](docs/hero.jpg)
+
 Adds one button to the end of every post's action row. Click it and the post
 opens in a studio tab, sitting on a gradient, ready to download at the size you
 need.
 
 ## Install
 
-1. Go to `chrome://extensions`.
-2. Turn on Developer mode.
-3. Click "Load unpacked" and pick this folder.
+1. Download `postcard.zip` from the [latest release](https://github.com/codiejay/postcard/releases/latest/download/postcard.zip) and unzip it somewhere permanent, not Downloads.
+2. Open `chrome://extensions`
+3. Turn on Developer mode, top right.
+4. Load unpacked, then pick the folder you unzipped.
 
-## What it does
+Keep that folder where it is. Chrome loads the extension from that exact path,
+so moving it breaks the install. It isn't on the Chrome Web Store, so there are
+no auto-updates.
+
+## The studio
+
+![The studio, with format, background, card and margin controls](docs/studio.jpg)
 
 The button reads the post out of the page: name, handle, verified badge, text,
 emoji, timestamp, view count, and up to four photos. Avatars and photos are
 refetched at full resolution, so the export is sharp rather than a scaled-up
 thumbnail.
 
-The studio gives you:
-
-- **Format** — Auto, 1:1, 4:5, 9:16, 16:9. The fixed formats export at exact
-  Instagram pixel sizes (1080×1080, 1080×1350, 1080×1920) and 1920×1080 for
-  landscape.
+- **Format** — Auto, 1:1, 4:5, 9:16, 16:9.
 - **Background** — six gradients. Dusk is the default.
 - **Card** — Dim, Black, or Light.
 - **Margin** — how much gradient sits around the card.
 
 Download saves a PNG. Copy puts it on the clipboard. ⌘S and ⌘C do the same.
 Your last choices are remembered for the next post.
+
+## Formats
+
+![The same post at 1:1, 4:5, 9:16 and 16:9](docs/formats.png)
+
+| Format | Exports at | For |
+| --- | --- | --- |
+| 1:1 | 1080 × 1080 | Instagram post |
+| 4:5 | 1080 × 1350 | Instagram portrait |
+| 9:16 | 1080 × 1920 | Story and Reels |
+| 16:9 | 1920 × 1080 | X and LinkedIn |
+| Auto | fits the post | anywhere |
+
+Instagram recompresses anything that isn't one of its own sizes, which is where
+the mush comes from. Hitting the size exactly leaves the file alone.
 
 ## About the Dusk gradient
 
@@ -69,10 +89,26 @@ src/background.js    fetches images, stashes the post, opens the studio
 studio/render.js     canvas renderer: layout, text wrapping, media grids
 studio/backgrounds.js  the gradients and the fitted colour field
 studio/studio.js     controls, export, settings
+dev/package.sh       builds the release zip
 ```
+
+## Building a release
+
+```
+./dev/package.sh
+```
+
+The asset is always named `postcard.zip`, never versioned. GitHub's permanent
+link is `/releases/latest/download/postcard.zip`, which resolves by filename, so
+a versioned asset silently breaks every link pointing at it. The version lives
+in the manifest and the release tag.
 
 ## Known gaps
 
 - Quote tweets, polls, and threads are not rendered. A quoted post is dropped.
 - Videos use their poster frame.
 - View counts only exist on a post's own page, not in the timeline.
+
+## Licence
+
+MIT. The post in the screenshots is a mock-up made with the tool.
