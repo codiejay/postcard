@@ -38,7 +38,7 @@ Your last choices are remembered for the next post.
 
 ## Formats
 
-![The same post at 1:1, 4:5, 9:16 and 16:9](docs/formats.png)
+![The same post at 1:1, 4:5, 9:16 and 16:9](docs/formats.webp)
 
 | Format | Exports at | For |
 | --- | --- | --- |
@@ -50,6 +50,14 @@ Your last choices are remembered for the next post.
 
 Instagram recompresses anything that isn't one of its own sizes, which is where
 the mush comes from. Hitting the size exactly leaves the file alone.
+
+## Samples
+
+![One post rendered five ways](docs/samples.webp)
+
+The same post, different settings. Dusk at 9:16 and 1:1, Paper with a light
+card, Slate with a black card at 16:9, and Plum at 4:5. The 9:16 one is a real
+export, made with the extension and not touched afterwards.
 
 ## About the Dusk gradient
 
@@ -111,4 +119,5 @@ in the manifest and the release tag.
 
 ## Licence
 
-MIT. The post in the screenshots is a mock-up made with the tool.
+MIT. The post in the samples is real. The one in the hero and studio shots is a
+mock-up, made with the tool.
