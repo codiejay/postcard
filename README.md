@@ -76,8 +76,8 @@ Hit the number exactly and it leaves the file alone.
 ![One post rendered five ways](docs/samples.webp)
 
 Same post, five settings. Dusk at 9:16 and 1:1, Paper with a light card, Slate
-with a black card at 16:9, Plum at 4:5. The 9:16 one came straight out of the
-extension and nothing happened to it afterwards.
+with a black card at 16:9, Plum at 4:5. The 9:16 one is the file I exported by
+hand. Nothing happened to it afterwards.
 
 ---
 
@@ -144,5 +144,5 @@ every link pointing at it. The version lives in the manifest and the tag.
 
 ---
 
-MIT. The post in the samples is real. The one in the hero and the studio shot is
-a mock-up, made with the extension.
+MIT. Every post in these shots is a real one of mine, run through the extension.
+Nothing here is a mock-up.
