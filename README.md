@@ -1,123 +1,148 @@
 # Postcard
 
-Turn a post on X into an image you can put on Instagram.
+A Chrome extension that turns a post on X into an image you can put on
+Instagram, at the exact pixel size Instagram wants so it stops chewing the file.
 
 ![A post rendered on the Dusk gradient](docs/hero.jpg)
 
-Adds one button to the end of every post's action row. Click it and the post
-opens in a studio tab, sitting on a gradient, ready to download at the size you
-need.
+One button, last in the post's action row, after share. Click it and the post
+opens in a studio tab on a gradient. Pick a size, download it.
+
+The default gradient, Dusk, is fitted to a reference image rather than picked
+out of a palette. More on that below, because it's the part I actually enjoyed.
+
+---
 
 ## Install
 
-1. Download `postcard.zip` from the [latest release](https://github.com/codiejay/postcard/releases/latest/download/postcard.zip) and unzip it somewhere permanent, not Downloads.
-2. Open `chrome://extensions`
-3. Turn on Developer mode, top right.
-4. Load unpacked, then pick the folder you unzipped.
+Not on the Chrome Web Store. Four steps:
 
-Keep that folder where it is. Chrome loads the extension from that exact path,
-so moving it breaks the install. It isn't on the Chrome Web Store, so there are
-no auto-updates.
+1. Grab [`postcard.zip`](https://github.com/codiejay/postcard/releases/latest/download/postcard.zip)
+   from Releases and unzip it.
+2. Open `chrome://extensions`.
+3. Turn on **Developer mode** (top right).
+4. **Load unpacked** → pick the unzipped folder.
+
+**Leave that folder where it is.** Chrome loads the extension from the path you
+picked. Move it or delete it and the extension goes with it. Put it somewhere
+you won't tidy up, not in Downloads.
+
+No auto-updates either. New version means downloading it again and hitting the
+refresh icon on the card.
+
+---
 
 ## The studio
 
 ![The studio, with format, background, card and margin controls](docs/studio.jpg)
 
-The button reads the post out of the page: name, handle, verified badge, text,
-emoji, timestamp, view count, and up to four photos. Avatars and photos are
-refetched at full resolution, so the export is sharp rather than a scaled-up
-thumbnail.
+The button reads the post straight out of the page: name, handle, verified
+badge, text, emoji, timestamp, view count, and up to four photos. It then goes
+back for the avatar and the photos at full resolution, so what you export is the
+real image and not a blown-up thumbnail.
 
-- **Format** — Auto, 1:1, 4:5, 9:16, 16:9.
-- **Background** — six gradients. Dusk is the default.
-- **Card** — Dim, Black, or Light.
-- **Margin** — how much gradient sits around the card.
+| Control | Options |
+|---|---|
+| Format | Auto, 1:1, 4:5, 9:16, 16:9 |
+| Background | six gradients, Dusk by default |
+| Card | Dim, Black, Light |
+| Margin | how much gradient sits around the card |
 
-Download saves a PNG. Copy puts it on the clipboard. ⌘S and ⌘C do the same.
-Your last choices are remembered for the next post.
+Download saves a PNG. Copy puts it on the clipboard. `⌘S` and `⌘C` do the same.
+Whatever you picked last time is what loads next time.
 
-## Formats
+---
+
+## Sizes
 
 ![The same post at 1:1, 4:5, 9:16 and 16:9](docs/formats.webp)
 
 | Format | Exports at | For |
-| --- | --- | --- |
+|---|---|---|
 | 1:1 | 1080 × 1080 | Instagram post |
 | 4:5 | 1080 × 1350 | Instagram portrait |
 | 9:16 | 1080 × 1920 | Story and Reels |
 | 16:9 | 1920 × 1080 | X and LinkedIn |
 | Auto | fits the post | anywhere |
 
-Instagram recompresses anything that isn't one of its own sizes, which is where
-the mush comes from. Hitting the size exactly leaves the file alone.
+This is the whole reason the sizes are hard-coded. Instagram recompresses
+anything that isn't one of its own sizes, and that's where the mush comes from.
+Hit the number exactly and it leaves the file alone.
+
+---
 
 ## Samples
 
 ![One post rendered five ways](docs/samples.webp)
 
-The same post, different settings. Dusk at 9:16 and 1:1, Paper with a light
-card, Slate with a black card at 16:9, and Plum at 4:5. The 9:16 one is a real
-export, made with the extension and not touched afterwards.
+Same post, five settings. Dusk at 9:16 and 1:1, Paper with a light card, Slate
+with a black card at 16:9, Plum at 4:5. The 9:16 one came straight out of the
+extension and nothing happened to it afterwards.
 
-## About the Dusk gradient
+---
 
-Dusk is not a hand-written set of colour stops. It is a degree-4 polynomial
-colour field, one polynomial per channel, fitted to a reference image over
-normalised coordinates:
+## Dusk
+
+Dusk isn't a list of colour stops. It's a degree-4 polynomial colour field, one
+polynomial per channel, fitted to a reference image over normalised coordinates:
 
 ```
 channel(u, v) = Σ c · u^i · v^j     for i + j ≤ 4
 ```
 
-Mean error against the source is 1.6 out of 255, which is below what an eye can
-see. The coefficients live in `studio/backgrounds.js`.
+Mean error against the source is **1.6 out of 255**, which is under what an eye
+resolves. The coefficients sit in `studio/backgrounds.js`.
 
-Fitting it this way rather than eyeballing stops buys two things. The gradient
-is diagonal and slightly curved, which no single linear gradient reproduces. And
-because the field is defined on normalised coordinates, it re-flows correctly
-from a wide 16:9 frame to a tall 9:16 one instead of being stretched.
+Two reasons to fit it instead of eyeballing stops. The gradient is diagonal
+*and* slightly curved, and the best single linear gradient I could fit was off
+by 7.4, which you can see. And because the field lives on normalised
+coordinates, it re-flows when you switch a wide 16:9 frame to a tall 9:16 one
+instead of stretching.
 
-A little grain is composited on top. The source image has it, and it keeps large
-exports from banding.
+There's grain over the top at 3.5% opacity. The source image has it, and it
+stops a 1080 × 1920 export from banding.
 
-## How it renders
+---
 
-There is one renderer, `studio/render.js`, and it draws to a canvas. The preview
-is that canvas at screen scale; the download is the same call at export scale.
-There is no second code path, so the file you get is the thing you were looking
-at.
+## One renderer
 
-## Files
+`studio/render.js` draws to a canvas. The preview is that canvas at screen
+scale. The download is the same call at export scale. There is no second code
+path, so the file you get is the thing you were looking at.
 
 ```
 manifest.json
-src/content.js       injects the button, reads the post
-src/content.css      button styling, matched to X's action row
-src/background.js    fetches images, stashes the post, opens the studio
-studio/render.js     canvas renderer: layout, text wrapping, media grids
+src/content.js         injects the button, reads the post
+src/content.css        button styling, matched to X's action row
+src/background.js      fetches images, stashes the post, opens the studio
+studio/render.js       layout, text wrapping, media grids, the draw
 studio/backgrounds.js  the gradients and the fitted colour field
-studio/studio.js     controls, export, settings
-dev/package.sh       builds the release zip
+studio/studio.js       controls, export, settings
+dev/package.sh         builds the release zip
 ```
 
-## Building a release
+---
+
+## Cutting a release
 
 ```
 ./dev/package.sh
 ```
 
-The asset is always named `postcard.zip`, never versioned. GitHub's permanent
-link is `/releases/latest/download/postcard.zip`, which resolves by filename, so
-a versioned asset silently breaks every link pointing at it. The version lives
-in the manifest and the release tag.
+The asset is always called `postcard.zip` and never carries a version. GitHub's
+permanent link is `/releases/latest/download/postcard.zip`, which resolves the
+release but takes the filename literally, so a versioned asset quietly breaks
+every link pointing at it. The version lives in the manifest and the tag.
 
-## Known gaps
+---
 
-- Quote tweets, polls, and threads are not rendered. A quoted post is dropped.
-- Videos use their poster frame.
-- View counts only exist on a post's own page, not in the timeline.
+## What it doesn't do
 
-## Licence
+- Quote tweets, polls and threads. A quoted post gets dropped.
+- Video. It uses the poster frame.
+- View counts in the timeline. X only renders those on the post's own page.
 
-MIT. The post in the samples is real. The one in the hero and studio shots is a
-mock-up, made with the tool.
+---
+
+MIT. The post in the samples is real. The one in the hero and the studio shot is
+a mock-up, made with the extension.
