@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Postcard</title>
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+<div class="app">
+  <main class="stage">
+    <div class="stage-inner">
+      <canvas id="preview"></canvas>
+    </div>
+    <p class="stage-meta"><span id="dims"></span></p>
+  </main>
+
+  <aside class="panel">
+    <header class="panel-head">
+      <h1>Postcard</h1>
+      <a id="source" class="source" href="#" target="_blank" rel="noreferrer" hidden>View post</a>
+    </header>
+
+    <section class="group">
+      <h2>Format</h2>
+      <div class="formats" id="formats"></div>
+    </section>
+
+    <section class="group">
+      <h2>Background</h2>
+      <div class="swatches" id="backgrounds"></div>
+    </section>
+
+    <section class="group">
+      <h2>Card</h2>
+      <div class="themes" id="themes"></div>
+    </section>
+
+    <section class="group">
+      <div class="row">
+        <h2>Margin</h2>
+        <span class="value" id="padding-value"></span>
+      </div>
+      <input id="padding" type="range" min="6" max="40" step="1">
+    </section>
+
+    <footer class="actions">
+      <button id="download" class="primary">Download PNG<kbd>⌘S</kbd></button>
+      <button id="copy" class="ghost">Copy image<kbd>⌘C</kbd></button>
+      <p class="status" id="status"></p>
+    </footer>
+  </aside>
+</div>
+<script type="module" src="studio.js"></script>
+</body>
+</html>

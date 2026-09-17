@@ -1,0 +1,49 @@
+.postcard-btn {
+  display: flex;
+  align-items: center;
+  margin-inline-start: 2px;
+}
+
+.postcard-btn button {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 9999px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.postcard-btn button:focus-visible {
+  outline: 2px solid rgb(29, 155, 240);
+  outline-offset: 2px;
+}
+
+.postcard-btn-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34.75px;
+  height: 34.75px;
+  margin: -8px;
+  border-radius: 9999px;
+  transition: background-color 0.15s ease;
+}
+
+.postcard-btn svg {
+  width: 18.75px;
+  height: 18.75px;
+  fill: rgb(113, 118, 123);
+  transition: fill 0.15s ease, transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.postcard-btn button:hover .postcard-btn-ring { background-color: rgba(29, 155, 240, 0.1); }
+.postcard-btn button:hover svg { fill: rgb(29, 155, 240); }
+.postcard-btn button:active svg { transform: scale(0.88); }
+
+.postcard-btn button.is-busy svg { fill: rgb(29, 155, 240); }
+
+/* X light theme */
+@media (prefers-color-scheme: light) {
+  .postcard-btn svg { fill: rgb(83, 100, 113); }
+}
