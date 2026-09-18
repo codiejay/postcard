@@ -1,7 +1,10 @@
 .postcard-btn {
   display: flex;
   align-items: center;
-  margin-inline-start: 2px;
+  /* X pins share to the right edge, so an appended sixth item lands flush
+     against it. Enough air to read as its own button, not so much that it
+     drifts away from the row. */
+  margin-inline-start: 14px;
 }
 
 .postcard-btn button {
@@ -30,20 +33,30 @@
   transition: background-color 0.15s ease;
 }
 
-.postcard-btn svg {
-  width: 18.75px;
-  height: 18.75px;
-  fill: rgb(113, 118, 123);
-  transition: fill 0.15s ease, transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+/* The Dusk background, shrunk to 17px. Same stops as the `dusk` swatch in
+   studio/backgrounds.js. */
+.postcard-chip {
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  background-image: linear-gradient(
+    168deg,
+    #0d284c 0%,
+    #3a6289 42%,
+    #a7a9a5 74%,
+    #edad5c 100%
+  );
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  opacity: 0.9;
+  transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.postcard-btn button:hover .postcard-btn-ring { background-color: rgba(29, 155, 240, 0.1); }
-.postcard-btn button:hover svg { fill: rgb(29, 155, 240); }
-.postcard-btn button:active svg { transform: scale(0.88); }
+.postcard-btn button:hover .postcard-btn-ring { background-color: rgba(58, 98, 137, 0.18); }
+.postcard-btn button:hover .postcard-chip { opacity: 1; transform: scale(1.06); }
+.postcard-btn button:active .postcard-chip { transform: scale(0.9); }
+.postcard-btn button.is-busy .postcard-chip { opacity: 0.55; transform: scale(0.9); }
 
-.postcard-btn button.is-busy svg { fill: rgb(29, 155, 240); }
-
-/* X light theme */
 @media (prefers-color-scheme: light) {
-  .postcard-btn svg { fill: rgb(83, 100, 113); }
+  .postcard-chip { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+  .postcard-btn button:hover .postcard-btn-ring { background-color: rgba(58, 98, 137, 0.12); }
 }

@@ -3,11 +3,10 @@
 
 const BTN = 'postcard-btn';
 
-const ICON = `<svg viewBox="0 0 24 24" aria-hidden="true">
-  <path d="M4.5 4.25h15A2.75 2.75 0 0 1 22.25 7v10a2.75 2.75 0 0 1-2.75 2.75h-15A2.75 2.75 0 0 1 1.75 17V7A2.75 2.75 0 0 1 4.5 4.25Zm0 1.75c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h15c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1h-15Z"></path>
-  <rect x="6.25" y="8.9" width="11.5" height="2.2" rx="1.1"></rect>
-  <rect x="6.25" y="12.9" width="7" height="2.2" rx="1.1"></rect>
-</svg>`;
+// The button is a swatch of the default background, not a glyph. Keep this in
+// sync with the `dusk` swatch in studio/backgrounds.js, which is the source of
+// truth for the colour. The chip itself is painted in content.css.
+const CHIP = '<span class="postcard-chip"></span>';
 
 /* ---------- reading the post ---------- */
 
@@ -70,6 +69,52 @@ function readPost(article) {
     if (poster) media.push(poster.getAttribute('poster'));
   }
 
+/* ---------- link preview cards ---------- */
+
+// A link preview is not a photo. X puts it in its own wrapper with no
+// tweetPhoto anywhere, which is why these used to vanish from the postcard.
+// The layout is an image, a title pill sitting on the image, and a "From
+// <domain>" line underneath it.
+function readCard(article) {
+  const wrap = article.querySelector('[data-testid="card.wrapper"]');
+  if (!wrap) return null;
+
+  // The image is usually an <img>, but X sometimes paints it as a CSS
+  // background instead, so check both before giving up.
+  let src = wrap.querySelector('img[src]')?.src || '';
+  if (!src) {
+    for (const el of wrap.querySelectorAll('*')) {
+      const m = getComputedStyle(el).backgroundImage.match(/url\(["']?(.+?)["']?\)/);
+      if (m && m[1].startsWith('http')) { src = m[1]; break; }
+    }
+  }
+  if (!src) return null;
+
+  const title = readText(
+    wrap.querySelector('[data-testid$=".detail"]') ||
+    wrap.querySelector('[data-testid$=".media"] span') ||
+    wrap
+  ).trim().split('\n')[0];
+
+  return { image: biggerMedia(src), title, domain: readDomain(article, wrap) };
+}
+
+// X prints the domain as "From example.com" in a sibling of the card, which is
+// English-only. Falling back to the first link in the post text covers the rest,
+// since a card almost always comes from a link that is in the post.
+function readDomain(article, wrap) {
+  const near = wrap.parentElement?.parentElement || article;
+  for (const el of near.querySelectorAll('span')) {
+    if (el.children.length) continue;
+    const m = el.textContent.trim().match(/^(?:From\s+)?([a-z0-9.-]+\.[a-z]{2,})$/i);
+    if (m) return m[1];
+  }
+  const link = article.querySelector('[data-testid="tweetText"] a[href]');
+  const shown = link?.textContent.trim().replace(/^https?:\/\//, '');
+  const host = shown?.split('/')[0];
+  return host && host.includes('.') ? host : '';
+}
+
   // Views only exist on the post detail page.
   let views = '';
   const analytics = article.querySelector('a[href$="/analytics"]');
@@ -91,6 +136,7 @@ function readPost(article) {
     text: readText(article.querySelector('[data-testid="tweetText"]')).replace(/\s+$/, ''),
     time: timeEl?.getAttribute('datetime') || '',
     media,
+    card: readCard(article),
     views,
     url,
   };
@@ -106,7 +152,7 @@ function makeButton(article) {
   btn.type = 'button';
   btn.setAttribute('aria-label', 'Make a postcard');
   btn.title = 'Make a postcard';
-  btn.innerHTML = `<span class="postcard-btn-ring">${ICON}</span>`;
+  btn.innerHTML = `<span class="postcard-btn-ring">${CHIP}</span>`;
 
   btn.addEventListener('click', async (e) => {
     e.preventDefault();

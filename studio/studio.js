@@ -9,6 +9,7 @@ const SAMPLE = {
   text: 'try @everyone, it looks nicer 😉\n\nalso notifies everybody, no matter if they\'re in the channel 😂',
   time: '2026-09-16T18:34:00.000Z',
   media: [],
+  card: null,
   views: '90',
   url: '',
 };
@@ -28,7 +29,7 @@ const el = {
 };
 
 let post = SAMPLE;
-let images = { avatar: null, media: [] };
+let images = { avatar: null, media: [], card: null };
 
 const opts = {
   aspect: '4x5',
@@ -245,6 +246,7 @@ async function boot() {
 
   images.avatar = await loadImage(post.avatar);
   images.media = (await Promise.all((post.media || []).map(loadImage))).filter(Boolean);
+  images.card = post.card ? await loadImage(post.card.image) : null;
 
   await document.fonts.ready;
   sync();

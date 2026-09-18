@@ -39,6 +39,14 @@ const M = {
   metaGap: 18,
   metaSize: 15,
   metaLh: 20,
+  linkInset: 13,
+  linkTitleSize: 14.5,
+  linkTitlePadX: 10,
+  linkTitlePadY: 6.5,
+  linkTitleRadius: 6,
+  linkDomainSize: 14.5,
+  linkDomainGap: 9,
+  linkDomainLh: 19,
 };
 
 const VERIFIED_PATH = new Path2D(
@@ -198,6 +206,7 @@ function mediaBoxes(count, w, images) {
 }
 
 export function layout(ctx, post, images) {
+  const photos = images.media || [];
   const inner = M.cardW - M.pad * 2;
   let y = M.pad;
 
@@ -213,11 +222,28 @@ export function layout(ctx, post, images) {
   }
 
   let media = null;
-  if (images.length) {
+  if (photos.length) {
     y += M.mediaGap;
-    const box = mediaBoxes(images.length, inner, images);
+    const box = mediaBoxes(photos.length, inner, photos);
     media = { y, h: box.h, cells: box.cells };
     y += box.h;
+  }
+
+  // A link preview sits where photos would, in its own shape: one image, a
+  // title pill laid over it, and the domain on a line of its own underneath.
+  let link = null;
+  if (images.card) {
+    y += M.mediaGap;
+    const img = images.card;
+    const ratio = img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.91;
+    const h = inner / Math.min(Math.max(ratio, 1.2), 2.4);
+    link = { y, h, domainY: 0 };
+    y += h;
+    if (post.card && post.card.domain) {
+      y += M.linkDomainGap;
+      link.domainY = y;
+      y += M.linkDomainLh;
+    }
   }
 
   const meta = metaParts(post);
@@ -229,7 +255,7 @@ export function layout(ctx, post, images) {
   }
 
   y += M.pad;
-  return { cardW: M.cardW, cardH: Math.round(y), headerY, lines, textY, media, meta, metaY };
+  return { cardW: M.cardW, cardH: Math.round(y), headerY, lines, textY, media, link, meta, metaY };
 }
 
 /* ---------- drawing ---------- */
@@ -333,6 +359,46 @@ function drawCard(ctx, post, images, L, theme) {
     ctx.restore();
   }
 
+  // Link preview
+  if (L.link) {
+    const c = L.link;
+    ctx.save();
+    roundRect(ctx, M.pad, c.y, inner, c.h, M.mediaRadius);
+    ctx.clip();
+    ctx.fillStyle = theme.id === 'light' ? '#eff3f4' : '#16181c';
+    ctx.fillRect(M.pad, c.y, inner, c.h);
+    drawCover(ctx, images.card, M.pad, c.y, inner, c.h);
+    ctx.restore();
+
+    const title = post.card && post.card.title;
+    if (title) {
+      ctx.font = font(400, M.linkTitleSize);
+      const room = inner - M.linkInset * 2 - M.linkTitlePadX * 2;
+      const label = ellipsize(ctx, title, room);
+      const w = ctx.measureText(label).width + M.linkTitlePadX * 2;
+      const h = M.linkTitleSize + M.linkTitlePadY * 2;
+      const x = M.pad + M.linkInset;
+      const y = c.y + c.h - M.linkInset - h;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.77)';
+      roundRect(ctx, x, y, w, h, M.linkTitleRadius);
+      ctx.fill();
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(label, x + M.linkTitlePadX, y + h / 2);
+    }
+
+    if (c.domainY) {
+      ctx.textBaseline = 'middle';
+      ctx.font = font(400, M.linkDomainSize);
+      ctx.fillStyle = theme.muted;
+      ctx.fillText(
+        ellipsize(ctx, `From ${post.card.domain}`, inner),
+        M.pad,
+        c.domainY + M.linkDomainLh / 2
+      );
+    }
+  }
+
   // Meta
   if (L.meta.length) {
     let x = M.pad;
@@ -350,7 +416,7 @@ function drawCard(ctx, post, images, L, theme) {
 
 // Returns the logical canvas size for a post, before any scaling.
 export function frame(ctx, post, images, opts) {
-  const L = layout(ctx, post, images.media);
+  const L = layout(ctx, post, images);
   const pad = M.cardW * opts.padding;
   let w = M.cardW + pad * 2;
   let h = L.cardH + pad * 2;

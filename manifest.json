@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Postcard",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Turn any post on X into a clean image you can post anywhere.",
   "icons": {
     "16": "assets/icon-16.png",

@@ -62,8 +62,9 @@ stretching. Grain sits over the top at 3.5% to stop large exports banding.
 `studio/render.js` draws both the preview and the export. Same call, different
 scale.
 
-Reads name, handle, verified badge, text, emoji, timestamp, view count, and up
-to four photos. Avatar and photos are refetched at full resolution.
+Reads name, handle, verified badge, text, emoji, timestamp, view count, up to
+four photos, and link previews with their title and domain. Avatar and images
+are refetched at full resolution.
 
 Not handled: quote tweets, polls, threads. Video uses the poster frame. View
 counts only exist on a post's own page.

@@ -25,6 +25,11 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     const post = msg.post;
     post.avatar = await toDataURL(post.avatar);
     post.media = (await Promise.all((post.media || []).map(toDataURL))).filter(Boolean);
+    if (post.card) {
+      post.card.image = await toDataURL(post.card.image);
+      // A link card with no image is a box of grey text. Drop it instead.
+      if (!post.card.image) post.card = null;
+    }
 
     const id = `pc_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await chrome.storage.local.set({ [id]: post });
